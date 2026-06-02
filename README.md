@@ -142,11 +142,6 @@ B = [[5, 6],
 
 print(matrix_addition(A, B))
 
-Anagram Check (check if the same char are in two words or not)
-def is_anagram(str1, str2):
-    return sorted(str1) == sorted(str2)
-
-print(is_anagram("listen", "silent"))
 
 
         
