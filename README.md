@@ -142,6 +142,117 @@ B = [[5, 6],
 
 print(matrix_addition(A, B))
 
+print("Hello, World!")
+age = 18      # age is of type int
+name = "John" # name is now of type str
+print(name)
 
+a = int(input("Enter a number: "))
+b = int(input("Enter a number: "))
+sub = a - b
+sum = a + b
+print("The Sum and Sub is: ",sum,sub)
+
+#Armstrong = 153 = 1^3+5^3+3^3=153
+n = int(input("Enter: "))
+temp = n
+s = 0
+while n > 0:
+    r = n % 10
+    s += r**3
+    n //= 10
+if s == temp:
+    print("Armstrong")
+else:
+    print("Not Armstrong")
+
+#GCD=GREATEST COMMON DIVISOR Ctrl + A to select all ,  Ctrl + / = # 
+a = int(input("Enter any number: ")) #int
+b = int(input("Enter any number: ")) #int
+while b != 0:
+    a,b = b,a%b
+print(a)
+
+#LCM=LEAST COMMON MULTIPLE
+a = int(input("Enter any number: "))
+b = int(input("Enter any number: "))
+x, y = a, b
+while y:
+    x, y = y, x%y
+print((a*b) // x)
+
+#Perfect number or not
+n = int(input("Enter any number: "))
+s = 0
+for i in range(1, n):
+    if n % i == 0:
+        s += i
+if s == n:
+    print("Perfect")
+else:
+    print("Not Perfect")
+
+#All prime no. between two numbers
+a = int(input("Enter any number: "))
+b = int(input("Enter any number: "))
+for n in range(a, b+1):
+    if n > 1:
+        for i in range(2, n):
+            if n % i == 0:
+                break
+            else:
+                print(n, end=" ")
+
+#Strong number or not
+import math 
+n = int(input("Enter any number: "))
+temp = n
+s = 0
+while n > 0:
+    s += math.factorial(n % 10)
+    n //= 10
+if s == temp:
+    print("Strong")
+else:
+    print("Not Strong")
+
+#Reverse a given number
+n = int(input("Enter any number: "))
+rev = 0
+while n > 0:
+    rev = rev * 10 + n % 10
+    n //= 10
+print(rev)
+
+#Palindrome or not 
+n = int(input("Enter any number: "))
+temp = n
+rev = 0
+while n > 0:
+    rev = rev * 10 + n % 10
+    n //= 10
+if temp == rev:
+    print("Palindrome")
+else:
+    print("Not Palindrome")
+
+#Convert decimal number into binary
+n = int(input("Enter any number: "))
+print(bin(n)[2:])
+
+# #Nth term of the fibonnaci series
+n = int(input("Enter any number: "))
+a, b = 0, 1
+for i in range(n):
+    a, b = b, a + b
+print(a)
+
+# #Two strings are anagrams
+s1 = input("Enter a string: ")
+s2 = input("Enter a string: ")
+if sorted(s1) == sorted(s2):
+    print("Anagrams")
+else:
+    print("Not Anagrams")
 
         
