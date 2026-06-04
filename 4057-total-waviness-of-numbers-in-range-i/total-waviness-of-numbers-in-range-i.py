@@ -1,23 +1,30 @@
 class Solution(object):
     def totalWaviness(self, num1, num2):
-
-        def waviness(x):
-            digits = [int(d) for d in str(x)]
-            n = len(digits)
-
-            if n < 3:
-                return 0
-
-            cnt = 0
-            for i in range(1, n - 1):
-                if ((digits[i] > digits[i - 1] and digits[i] > digits[i + 1]) or
-                    (digits[i] < digits[i - 1] and digits[i] < digits[i + 1])):
-                    cnt += 1
-
-            return cnt
-
-        ans = 0
-        for x in range(num1, num2 + 1):
-            ans += waviness(x)
-
-        return ans
+        """
+        :type num1: int
+        :type num2: int
+        :rtype: int
+        """
+        total_score = 0
+        
+        # Iterate over all numbers in the inclusive range
+        for num in range(num1, num2 + 1):
+            s = str(num)
+            length = len(s)
+            
+            # Numbers with fewer than 3 digits have a waviness of 0
+            if length < 3:
+                continue
+                
+            # Check every interior digit
+            for i in range(1, length - 1):
+                prev_digit = s[i - 1]
+                curr_digit = s[i]
+                next_digit = s[i + 1]
+                
+                # Check for Peak or Valley conditions
+                if (curr_digit > prev_digit and curr_digit > next_digit) or \
+                   (curr_digit < prev_digit and curr_digit < next_digit):
+                    total_score += 1
+                    
+        return total_score
