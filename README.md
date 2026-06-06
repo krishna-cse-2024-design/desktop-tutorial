@@ -255,4 +255,21 @@ if sorted(s1) == sorted(s2):
 else:
     print("Not Anagrams")
 
+#python with matplotlib
+import matplotlib.pyplot as plt
+
+# Programming languages and their percentages
+languages = ['Python', 'Java', 'C++', 'JavaScript', 'C']
+percentages = [35, 25, 15, 15, 10]
+
+# Create pie chart
+plt.pie(
+    percentages,
+    labels=languages,
+    autopct='%1.1f%%',
+    startangle=90
+)
+
+plt.title("Programming Language Popularity (%)")
+plt.show()
         
