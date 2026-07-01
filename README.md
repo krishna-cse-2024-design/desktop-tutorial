@@ -337,4 +337,68 @@ fact = 1
 for i in range(1, n + 1):
     fact = fact * i
     print(f"{i}! = {fact}")
+    
+#* Single            
+print("*")
+
+#Horizontal Line
+n = 5
+print("*" * n)
+
+#Vertical Line
+n = 5
+for i in range(n):
+    print("*")
+
+#Square Pattern
+n = 5
+for i in range(n):
+    print("*" * n)
+    
+#Right Triangle
+n = 5
+for i in range(1, n + 1):
+    print("*" * i)
+    
+#Inverted Right Triangle
+n = 5
+for i in range(n, 0, -1):
+    print("*" * i)
+    
+#Pyramid
+n = 5
+for i in range(n):
+    spaces = " " * (n - i - 1)
+    stars = "*" * (2 * i + 1)
+    print(spaces + stars)
+    
+#Inverted Pyramid
+n = 5
+for i in range(n):
+    spaces = " " * i
+    stars = "*" * (2 * (n - i) - 1)
+    print(spaces + stars)
+    
+#Diamond
+n = 5
+
+# Upper half
+for i in range(n):
+    spaces = " " * (n - i - 1)
+    stars = "*" * (2 * i + 1)
+    print(spaces + stars)
+
+# Lower half
+for i in range(n - 2, -1, -1):
+    spaces = " " * (n - i - 1)
+    stars = "*" * (2 * i + 1)
+    print(spaces + stars)
+    
+#Hollow Square
+n = 5
+for i in range(n):
+    if i == 0 or i == n - 1:
+        print("*" * n)
+    else:
+        print("*" + " " * (n - 2) + "*")
         
