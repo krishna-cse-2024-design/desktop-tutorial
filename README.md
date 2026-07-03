@@ -401,4 +401,70 @@ for i in range(n):
         print("*" * n)
     else:
         print("*" + " " * (n - 2) + "*")
+
+#Project: Password Strength Checker
+import string
+
+
+def check_password_strength(password):
+    score = 0
+    feedback = []
+
+    # Minimum length
+    if len(password) >= 8:
+        score += 1
+    else:
+        feedback.append("Password should be at least 8 characters long.")
+
+    # Uppercase
+    if any(char.isupper() for char in password):
+        score += 1
+    else:
+        feedback.append("Add at least one uppercase letter.")
+
+    # Lowercase
+    if any(char.islower() for char in password):
+        score += 1
+    else:
+        feedback.append("Add at least one lowercase letter.")
+
+    # Digit
+    if any(char.isdigit() for char in password):
+        score += 1
+    else:
+        feedback.append("Add at least one number.")
+
+    # Special character
+    if any(char in string.punctuation for char in password):
+        score += 1
+    else:
+        feedback.append("Add at least one special character.")
+
+    if score == 5:
+        strength = "Very Strong 💪"
+    elif score == 4:
+        strength = "Strong ✅"
+    elif score == 3:
+        strength = "Medium ⚠️"
+    else:
+        strength = "Weak ❌"
+
+    return strength, feedback
+
+
+def main():
+    password = input("Enter your password: ")
+
+    strength, feedback = check_password_strength(password)
+
+    print("\nPassword Strength:", strength)
+
+    if feedback:
+        print("\nSuggestions:")
+        for item in feedback:
+            print("-", item)
+
+
+if __name__ == "__main__":
+    main()
         
