@@ -1,67 +1,79 @@
 class Solution:
     def pathsWithMaxScore(self, board: List[str]) -> List[int]:
-        """
-        Find the maximum score and number of paths from 'E' to 'S' on the board.
-      
-        Args:
-            board: 2D grid where 'E' is end, 'S' is start, 'X' is obstacle, digits are scores
-          
-        Returns:
-            List containing [max_score, number_of_paths] or [0, 0] if no valid path exists
-        """
-      
-        def update_cell(curr_row: int, curr_col: int, prev_row: int, prev_col: int) -> None:
-            """
-            Update the current cell's score and path count based on the previous cell.
-          
-            Args:
-                curr_row, curr_col: Current cell coordinates
-                prev_row, prev_col: Previous cell coordinates to check
-            """
-            # Skip if previous cell is out of bounds or unreachable
-            if prev_row >= board_size or prev_col >= board_size or max_score[prev_row][prev_col] == -1:
-                return
-          
-            # Skip if current cell is obstacle or start position
-            if board[curr_row][curr_col] in "XS":
-                return
-          
-            # If previous cell has better score, update current cell
-            if max_score[prev_row][prev_col] > max_score[curr_row][curr_col]:
-                max_score[curr_row][curr_col] = max_score[prev_row][prev_col]
-                path_count[curr_row][curr_col] = path_count[prev_row][prev_col]
-            # If previous cell has same score, add its path count to current
-            elif max_score[prev_row][prev_col] == max_score[curr_row][curr_col]:
-                path_count[curr_row][curr_col] += path_count[prev_row][prev_col]
-      
-        board_size = len(board)
-      
-        # max_score[i][j] stores the maximum score to reach cell (i, j)
-        max_score = [[-1] * board_size for _ in range(board_size)]
-      
-        # path_count[i][j] stores the number of paths with maximum score to reach cell (i, j)
-        path_count = [[0] * board_size for _ in range(board_size)]
-      
-        # Initialize the end position 'S' at bottom-right corner
-        max_score[-1][-1] = 0
-        path_count[-1][-1] = 1
-      
-        # Process cells from bottom-right to top-left
-        for row in range(board_size - 1, -1, -1):
-            for col in range(board_size - 1, -1, -1):
-                # Update current cell from three possible previous cells
-                update_cell(row, col, row + 1, col)      # Cell below
-                update_cell(row, col, row, col + 1)      # Cell to the right
-                update_cell(row, col, row + 1, col + 1)  # Cell diagonally down-right
-              
-                # Add the score of current cell if it's reachable and contains a digit
-                if max_score[row][col] != -1 and board[row][col].isdigit():
-                    max_score[row][col] += int(board[row][col])
-      
+        n = len(board)
         MOD = 10**9 + 7
-      
-        # Return result for start position 'E' at top-left corner
-        if max_score[0][0] == -1:
+        limit = n - 1
+        
+        # O(N) Space: Track only the row below us
+        next_score = [-1] * n
+        next_count = [0] * n
+        
+        # Base Case Setup on the bottom-most row boundary
+        next_score[limit] = 0
+        next_count[limit] = 1
+        
+        # Process the grid bottom-up, row by row
+        for r in range(limit, -1, -1):
+            board_row = board[r]
+            
+            # Temporary arrays for the current row we are computing
+            curr_score = [-1] * n
+            curr_count = [0] * n
+            
+            # Special case handling for the starting cell on the very first loop pass
+            if r == limit:
+                curr_score[limit] = 0
+                curr_count[limit] = 1
+            
+            for c in range(limit, -1, -1):
+                # Skip the starting cell execution flow and obstacles
+                if (r == limit and c == limit) or board_row[c] == 'X':
+                    continue
+                
+                best_score = -1
+                ways = 0
+                
+                # Direction 1: Look Down (Pushed from next_score row array)
+                if r < limit:
+                    s_down = next_score[c]
+                    if s_down > best_score:
+                        best_score = s_down
+                        ways = next_count[c]
+                    elif s_down == best_score and s_down != -1:
+                        ways = (ways + next_count[c]) % MOD
+                
+                # Direction 2: Look Right (Pulled from our active curr_score row array)
+                if c < limit:
+                    s_right = curr_score[c + 1]
+                    if s_right > best_score:
+                        best_score = s_right
+                        ways = curr_count[c + 1]
+                    elif s_right == best_score and s_right != -1:
+                        ways = (ways + curr_count[c + 1]) % MOD
+                        
+                # Direction 3: Look Down-Right Diagonal (Pushed from next_score row array)
+                if r < limit and c < limit:
+                    s_diag = next_score[c + 1]
+                    if s_diag > best_score:
+                        best_score = s_diag
+                        ways = next_count[c + 1]
+                    elif s_diag == best_score and s_diag != -1:
+                        ways = (ways + next_count[c + 1]) % MOD
+                
+                # Commit finalized state if cell is accessible
+                if best_score != -1:
+                    char = board_row[c]
+                    current_val = 0 if char == 'E' else (ord(char) - 48)
+                    curr_score[c] = best_score + current_val
+                    curr_count[c] = ways
+            
+            # Shift state: Current row becomes the "next row" for the loop step above
+            next_score = curr_score
+            next_count = curr_count
+                    
+        # Grab destination states from the top-leftmost indices of our shifted row arrays
+        final_score = next_score[0]
+        if final_score == -1:
             return [0, 0]
-        else:
-            return [max_score[0][0], path_count[0][0] % MOD]
+            
+        return [final_score, next_count[0]]
