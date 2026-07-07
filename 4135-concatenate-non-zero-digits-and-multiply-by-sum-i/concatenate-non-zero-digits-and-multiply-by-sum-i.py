@@ -1,5 +1,10 @@
 class Solution:
     def sumAndMultiply(self, n: int) -> int:
-        digits = [int(c) for c in str(n) if c != '0']
-        x = int(''.join(map(str, digits))) if digits else 0 
-        return x * sum(digits)
+        x = 0
+        sum = 0
+        for c in str(n):
+            d = int(c)
+            sum += d
+            if d > 0:
+                x = x * 10 + d
+        return x * sum
