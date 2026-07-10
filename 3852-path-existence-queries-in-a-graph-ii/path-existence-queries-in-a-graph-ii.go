@@ -1,49 +1,77 @@
 func pathExistenceQueries(n int, nums []int, maxDiff int, queries [][]int) []int {
     idx := make([]int, n)
-    for i := range idx {
-        idx[i] = i
-    }
-    sort.Slice(idx, func (i, j int) bool { return nums[idx[i]] < nums[idx[j]] })
-    r := make([]int, n)
-    arr := make([]int, n)
-    for i, g, b := 0, 0, -1; i < n; i++ {
-        u := idx[i]
-        if nums[u] > b {
-            g = u
-        }
-        r[u], b = g, nums[u] + maxDiff
-        arr[u] = idx[i + sort.Search(n - 1 - i, func (j int) bool { return nums[idx[j + i + 1]] > b })]
-    }
-    dp := [][]int{arr}
-    for b := 2; b < n; b <<= 1 {
-        arr2 := make([]int, n)
-        for i := range arr2 {
-            arr2[i] = arr[arr[i]]
-        }
-        dp = append(dp, arr2)
-        arr = arr2
-    }
-    res := make([]int, len(queries))
-    m := len(dp)
-    for i, q := range queries {
-        u, v := q[0], q[1]
-        switch {
-            case r[u] != r[v]:
-            res[i] = -1
-            continue
-            case nums[v] < nums[u]:
-            u, v = v, u
-        }
-        for u != v {
-            k := sort.Search(m, func (k int) bool { return nums[dp[k][u]] >= nums[v] })
-            if k == 0 {
-                res[i]++
-                u = v
-            } else {
-                res[i] += 1 << (k - 1)
-                u = dp[k - 1][u]
-            }
-        }
-    }
-    return res
+	pos := make([]int, n)
+
+	for i := 0; i < n; i++ {
+		idx[i] = i
+	}
+
+	sort.Slice(idx, func(i, j int) bool {
+		return nums[idx[i]] < nums[idx[j]]
+	})
+
+	for i := 0; i < n; i++ {
+		pos[idx[i]] = i
+	}
+
+	m := 0
+	for t := n; t > 0; t >>= 1 {
+		m++
+	}
+
+	f := make([][]int, n)
+	for i := range f {
+		f[i] = make([]int, m)
+	}
+
+	left := 0
+
+	for i := 0; i < n; i++ {
+		for left < i &&
+			nums[idx[i]]-nums[idx[left]] > maxDiff {
+			left++
+		}
+
+		f[i][0] = left
+	}
+
+	for j := 1; j < m; j++ {
+		for i := 0; i < n; i++ {
+			f[i][j] = f[f[i][j-1]][j-1]
+		}
+	}
+
+	res := make([]int, 0, len(queries))
+
+	for _, q := range queries {
+
+		x := pos[q[0]]
+		y := pos[q[1]]
+
+		if x > y {
+			x, y = y, x
+		}
+
+		if x == y {
+			res = append(res, 0)
+			continue
+		}
+
+		step := 0
+
+		for i := m - 1; i >= 0; i-- {
+			if f[y][i] > x {
+				y = f[y][i]
+				step += 1 << i
+			}
+		}
+
+		if f[y][0] <= x {
+			res = append(res, step+1)
+		} else {
+			res = append(res, -1)
+		}
+	}
+
+	return res
 }
