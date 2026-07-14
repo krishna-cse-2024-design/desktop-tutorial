@@ -1,22 +1,27 @@
+from functools import lru_cache
+
 class Solution:
-    def isScramble(self,s1, s2):
-        m ={}
-        def func(s1, s2):
-            if (s1, s2) in m:
-                return m[(s1, s2)]
-            if not sorted(s1) == sorted(s2):
-                return False
-            if len(s1) == 1:
+    def isScramble(self, s1: str, s2: str) -> bool:
+        @lru_cache(None)
+        def dfs(a, b):
+            if a == b:
                 return True
-            
 
-            for i in range(1, len(s1)):
-                if func(s1[:i], s2[-i:]) and func(s1[i:], s2[:-i]) or func(s1[:i], s2[:i]) and func(s1[i:], s2[i:]):
-                    m[(s1, s2)] = True
+            if sorted(a) != sorted(b):
+                return False
+
+            n = len(a)
+
+            for i in range(1, n):
+                # Without swap
+                if dfs(a[:i], b[:i]) and dfs(a[i:], b[i:]):
                     return True
-            m[(s1, s2)] = False
+
+                # With swap
+                if dfs(a[:i], b[n - i:]) and dfs(a[i:], b[:n - i]):
+                    return True
+
             return False
-        return func(s1, s2)
 
-
-
+        return dfs(s1, s2)
+        
