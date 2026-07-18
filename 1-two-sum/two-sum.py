@@ -1,11 +1,10 @@
 class Solution:
-    def twoSum(self, nums: List[int], target: int) -> List[int]:
-        counter = defaultdict(int)
-        for i, n in enumerate(nums):
-            counter[n] = i
-        
-        for i, num in enumerate(nums):
-            complement = target - num
-            if complement in counter and counter[complement] != i:
-                return [i, counter[complement]]
-                
+   def twoSum(self, nums: List[int], target: int) -> List[int]:
+       seen = {}
+       for i, value in enumerate(nums): #1
+           remaining = target - nums[i] #2
+           
+           if remaining in seen: #3
+               return [i, seen[remaining]]  #4
+           else:
+               seen[value] = i  #5
