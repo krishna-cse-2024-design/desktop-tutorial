@@ -5,6 +5,5 @@ class Solution:
         #Euclidean Algorithm
         while b:
             a,b = b, a % b
-
         return a
         
