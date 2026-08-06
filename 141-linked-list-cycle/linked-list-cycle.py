@@ -1,7 +1,6 @@
 class Solution:
     def hasCycle(self, head):
-        slow = head
-        fast = head
+        slow = fast = head
 
         while fast and fast.next:
             slow = slow.next          # Move one step
