@@ -1,9 +1,12 @@
 class Solution:
     def smallestNumber(self, n: int, t: int) -> int:
-        while True:
-            prod = 1
-            for d in str(n):
-                prod *= int(d)
-            if prod % t == 0:
-                return n
-            n += 1
+        for i in range(n,n+1000):
+            x=i
+            pr=1
+            while x>0:
+                pr*=x%10
+                x//=10
+            if pr%t==0:
+                return i
+                
+        
