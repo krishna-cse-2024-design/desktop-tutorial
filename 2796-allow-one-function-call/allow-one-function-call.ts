@@ -1,23 +1,21 @@
-type Func<T, U> = (...args: T[]) => U;
+type JSONValue = null | boolean | number | string | JSONValue[] | { [key: string]: JSONValue };
+type OnceFn = (...args: JSONValue[]) => JSONValue | undefined
 
-function once<T, U>(fn: Func<T, U>): Func<T, U | undefined> {
-  let hasBeenCalled = false;
-  let result: U;
-
-  return function (...args: T[]): U | undefined {
-    if (!hasBeenCalled) {
-      result = fn(...args);
-      hasBeenCalled = true;
-      return result;
-    } else {
-      return undefined;
-    }
-  }
+function once(fn: Function): OnceFn {
+    let called = false;
+    return function (...args) {
+        if (called){
+            return undefined
+        }
+        called = true
+        return fn(...args)
+    };
 }
 
-// Example usage:
-let fn = (a: number, b: number, c: number) => (a + b + c);
-let onceFn = once(fn);
-
-console.log(onceFn(1, 2, 3)); // 6
-console.log(onceFn(2, 3, 6)); // undefined
+/**
+ * let fn = (a,b,c) => (a + b + c)
+ * let onceFn = once(fn)
+ *
+ * onceFn(1,2,3); // 6
+ * onceFn(2,3,6); // returns undefined without calling fn
+ */
