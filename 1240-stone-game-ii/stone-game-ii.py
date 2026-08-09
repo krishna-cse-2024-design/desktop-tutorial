@@ -1,27 +1,47 @@
 class Solution:
     def stoneGameII(self, piles: List[int]) -> int:
-        N = len(piles)
+        # Initialize the memoization table
+        memo = [[0] * len(piles) for _ in range(len(piles))]
+        # Initialize the suffixSum array
+        suffix_sum = piles[:]
 
-        dp = [[[-1]* (2*N) for _ in range(2)] for _ in range(N)]
-        
-        def solve(index, turn, m):
-            if index == N:
-                return 0
+        # Compute the suffix sums
+        for i in range(len(suffix_sum) - 2, -1, -1):
+            suffix_sum[i] += suffix_sum[i + 1]
 
-            if dp[index][turn][m] != -1:
-                return dp[index][turn][m]    
+        # Call the recursive function to find the maximum stones Alex can collect
+        return self.max_stones(suffix_sum, 1, 0, memo)
 
-            res = float("inf") if turn else float("-inf")   
-            
-            sm = 0
-            for i in range(2*m):
-                if index+i < N:
-                    sm += piles[index+i]
-                    if not turn:
-                        res = max(res, sm+solve(index+i+1, turn^1, max(m, i+1)))
-                    else:
-                        res = min(res, solve(index+i+1, turn^1, max(m, i+1)))
-            dp[index][turn][m] = res
-            return res
-        return solve(0, 0, 1)                  
-        
+    def max_stones(
+        self,
+        suffix_sum: List[int],
+        max_till_now: int,
+        curr_index: int,
+        memo: List[List[int]],
+    ) -> int:
+        # If the current index plus twice the maxTillNow exceeds the array size, take all remaining stones
+        if curr_index + 2 * max_till_now >= len(suffix_sum):
+            return suffix_sum[curr_index]
+
+        # Return the memoized result if it exists
+        if memo[curr_index][max_till_now] > 0:
+            return memo[curr_index][max_till_now]
+
+        # Initialize the result to a very large number (infinity)
+        res = float("inf")
+
+        # Iterate through possible moves and calculate the minimum result for the opponent
+        for i in range(1, 2 * max_till_now + 1):
+            res = min(
+                res,
+                self.max_stones(
+                    suffix_sum,
+                    max(i, max_till_now),
+                    curr_index + i,
+                    memo,
+                ),
+            )
+
+        # Memoize the result as the current suffix sum minus the opponent's best outcome
+        memo[curr_index][max_till_now] = suffix_sum[curr_index] - res
+        return memo[curr_index][max_till_now]
