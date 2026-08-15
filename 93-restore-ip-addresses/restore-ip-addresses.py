@@ -1,33 +1,25 @@
 class Solution:
     def restoreIpAddresses(self, s: str) -> List[str]:
-
-        n = len(s)
         ans = []
 
-        def createIP(idx, expr, dots):
-
-            if dots > 4:
+        def backtrack(i, parts):
+            if len(parts) == 4:
+                if i == len(s):
+                    ans.append(".".join(parts))
                 return
 
-            if idx == n:
-                if dots == 4:
-                    ans.append(expr)
-                return
+            for j in range(i, min(i + 3, len(s))):
+                part = s[i:j + 1]
 
-            for i in range(idx, min(idx + 3, n)):
+                if len(part) > 1 and part[0] == '0':
+                    continue
 
-                curr = s[idx:i + 1]
+                if int(part) > 255:
+                    continue
 
-                if len(curr) > 1 and curr[0] == "0":
-                    break
+                parts.append(part)
+                backtrack(j + 1, parts)
+                parts.pop()
 
-                if int(curr) <= 255:
-                    if idx == 0:
-                        createIP(i + 1, curr, dots + 1)
-                    else:
-                        createIP(i + 1, expr + "." + curr, dots + 1)
-                else:
-                    break
-
-        createIP(0, "", 0)
+        backtrack(0, [])
         return ans
