@@ -1,13 +1,11 @@
 class Solution:
-    def stoneGameIX(self, stones: List[int]) -> bool:
-        cnt0 = cnt1 = cnt2 = 0
-        for val in stones:
-            if (typ := val % 3) == 0:
-                cnt0 += 1
-            elif typ == 1:
-                cnt1 += 1
-            else:
-                cnt2 += 1
-        if cnt0 % 2 == 0:
-            return cnt1 >= 1 and cnt2 >= 1
-        return cnt1 - cnt2 > 2 or cnt2 - cnt1 > 2
+    def stoneGameIX(self, stones):
+        cnt = [0, 0, 0]
+
+        for x in stones:
+            cnt[x % 3] += 1
+
+        if cnt[0] % 2 == 0:
+            return cnt[1] > 0 and cnt[2] > 0
+        else:
+            return abs(cnt[1] - cnt[2]) > 2
