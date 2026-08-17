@@ -1,55 +1,50 @@
 class Solution:
     def stoneGameV(self, stoneValue: List[int]) -> int:
-        prefix = list(accumulate(stoneValue, initial=0))
-
+        
         @cache
-        def dfs(l, r):
-            if l >= r:
+        def find_max_score(first: int, last: int, total_sum: int) -> int:
+            #print(first, last, total_sum)
+
+            length = last - first
+            if length <= 1:
                 return 0
+            #if length == 2:
+            #    return min(stoneValue[first], stoneValue[first + 1])
 
-            ans = 0
+            half_sum = total_sum / 2
+
             left_sum = 0
-            right_sum = prefix[r + 1] - prefix[l]
+            for i, num in enumerate(stoneValue[first:last], start=first):
+                left_sum += num
+                if left_sum >= half_sum:
+                    break
 
-            for k in range(l, r):
-                left_sum += stoneValue[k]
-                right_sum -= stoneValue[k]
+            max_score = 0
 
-                if left_sum < right_sum:
-                    # Alice keeps the left side.
-                    #
-                    # If ans >= 2 * left_sum, this split
-                    # cannot improve the answer.
-                    if ans >= 2 * left_sum:
-                        continue
+            left_i = right_i = i
+            right_sum = total_sum - left_sum
+            if left_sum > half_sum:
+                left_sum -= stoneValue[i]
+                left_i -= 1
 
-                    ans = max(
-                        ans,
-                        left_sum + dfs(l, k)
-                    )
+            j = left_i + 1
+            while 2 * left_sum > max_score:
+                score = left_sum + find_max_score(first, j, left_sum)
+                if max_score < score:
+                    max_score = score
+                j -= 1
+                left_sum -= stoneValue[j]
 
-                elif left_sum > right_sum:
-                    # Alice keeps the right side.
-                    #
-                    # As k increases, right_sum decreases.
-                    # If ans >= 2 * right_sum, then every
-                    # later split is also useless.
-                    if ans >= 2 * right_sum:
-                        break
+            j = right_i + 1
+            while 2 * right_sum > max_score:
+                score = right_sum + find_max_score(j, last, right_sum)
+                if max_score < score:
+                    max_score = score
+                right_sum -= stoneValue[j]
+                j += 1
+                
+            #print(first, last, total_sum, max_score)
 
-                    ans = max(
-                        ans,
-                        right_sum + dfs(k + 1, r)
-                    )
+            return max_score
 
-                else:
-                    # Equal sums: Alice can choose either side.
-                    ans = max(
-                        ans,
-                        left_sum + dfs(l, k),
-                        right_sum + dfs(k + 1, r)
-                    )
-
-            return ans
-
-        return dfs(0, len(stoneValue) - 1)
+        return find_max_score(0, len(stoneValue), sum(stoneValue))
