@@ -1,34 +1,24 @@
 class Solution:
-    def maxJumps(self, nums: List[int], d: int) -> int:
-        N = len(nums)
-        seen = set()
-        dp = [1] * N
+    def maxJumps(self, arr: List[int], d: int) -> int:
+        n = len(arr)
 
-        def recursion(indx):
-            if indx in seen:
-                return dp[indx]
-            if indx < 0 or indx >= N:
-                return 0
+        dp = [1]*n
 
-            tempR, tempL = 0, 0
-            curr = nums[indx]
+        sorted_indices = sorted(range(n), key = lambda x: arr[x])
 
-            for i in range(indx + 1, min(indx + d + 1, N)):
-                if nums[i] < curr:
-                    tempR = max(tempR, recursion(i))
-                else:
+        for i in sorted_indices:
+            for x in range(1, d+1):
+                j = i - x
+                if j < 0 or arr[j] >= arr[i]:
                     break
-            for i in range(indx - 1, max(-1, indx - d - 1), -1):
-                if nums[i] < curr:
-                    tempL = max(tempL, recursion(i))
-                else:
+                
+                dp[i] = max(dp[i], 1+dp[j])
+
+            for x in range(1, d+1):
+                j = i+x
+                if j >= n or arr[j] >= arr[i]:
                     break
+                dp[i] = max(dp[i], 1+dp[j])
 
-            dp[indx] = max(tempR, tempL) + 1
-            seen.add(indx)
-            return dp[indx]
 
-        for i in range(N):
-            if i not in seen:
-                recursion(i)
         return max(dp)
