@@ -1,22 +1,23 @@
+from typing import List
+
 class Solution:
     def minCost(self, m: int, n: int, waitCost: List[List[int]]) -> int:
-        INF = 10**15
-        dp = [[[-1, -1] for _ in range(n)] for _ in range(m)]
-        return 1 + self.f(0, 0, 1, waitCost, dp)
-
-    def f(self, i: int, j: int, parity: int, waitCost: List[List[int]], dp: List[List[List[int]]]) -> int:
-        m, n = len(waitCost), len(waitCost[0])
-        if i == m - 1 and j == n - 1:
-            return 0
-        if i < 0 or i >= m or j < 0 or j >= n:
-            return 10**15
-        if dp[i][j][parity] != -1:
-            return dp[i][j][parity]
-        ans = 10**15
-        if parity == 1:
-            ans = min(ans, (i + 2) * (j + 1) + self.f(i + 1, j, 0, waitCost, dp))
-            ans = min(ans, (i + 1) * (j + 2) + self.f(i, j + 1, 0, waitCost, dp))
-        else:
-            ans = min(ans, waitCost[i][j] + self.f(i, j, 1, waitCost, dp))
-        dp[i][j][parity] = ans
-        return ans
+        INF = 1 << 62
+        row = [INF]*n
+        row[0] = 1
+        w0 = waitCost[0]
+        for j in range(1, n):
+            prev = row[j-1] + (0 if j == 1 else w0[j-1])
+            row[j] = prev + (j+1)
+        for i in range(1, m):
+            wp = waitCost[i-1]
+            wc = waitCost[i]
+            nr = [INF]*n
+            base = row[0] + (0 if i == 1 else wp[0])
+            nr[0] = base + (i+1)
+            for j in range(1, n):
+                a = row[j] + wp[j]
+                b = nr[j-1] + wc[j-1]
+                nr[j] = (a if a < b else b) + (i+1)*(j+1)
+            row = nr
+        return row[n-1]
