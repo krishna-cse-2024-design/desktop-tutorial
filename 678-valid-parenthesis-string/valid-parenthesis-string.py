@@ -1,32 +1,31 @@
 class Solution:
     def checkValidString(self, s: str) -> bool:
+        # st = [] record left parenthesis
+        # star = []
+        # if *
+        # if '(' -> st.append(i)
+        # ')'-> st.pop() if not st-> star.pop()
+        #O(n),O(n)
+        left = []
+        star = []
         n = len(s)
-        memo = [[-1] * n for _ in range(n)]
-        return self.is_valid_string(0, 0, s, memo)
+        for i in range(n):
+            if s[i]=='(':
+                left.append(i)
+            elif s[i]=='*':
+                star.append(i)
+            elif s[i]==')':
+                if left:
+                    left.pop()
+                elif star:
+                    star.pop()
+                else:
+                    return False
+        while left and star and left[-1]<star[-1]:
+            left.pop()
+            star.pop()
+        if len(left)>0:
+            return False
+        return True
 
-    def is_valid_string(self, index: int, open_count: int, s: str, memo: List[List[int]]) -> bool:
-        # If reached end of the string, check if all brackets are balanced
-        if index == len(s):
-            return open_count == 0
 
-        # If already computed, return memoized result
-        if memo[index][open_count] != -1:
-            return memo[index][open_count] == 1
-
-        is_valid = False
-        # If encountering '*', try all possibilities
-        if s[index] == '*':
-            is_valid |= self.is_valid_string(index + 1, open_count + 1, s, memo)  # Treat '*' as '('
-            if open_count > 0:
-                is_valid |= self.is_valid_string(index + 1, open_count - 1, s, memo)  # Treat '*' as ')'
-            is_valid |= self.is_valid_string(index + 1, open_count, s, memo)  # Treat '*' as empty
-        else:
-            # Handle '(' and ')'
-            if s[index] == '(':
-                is_valid = self.is_valid_string(index + 1, open_count + 1, s, memo)  # Increment count for '('
-            elif open_count > 0:
-                is_valid = self.is_valid_string(index + 1, open_count - 1, s, memo)  # Decrement count for ')'
-
-        # Memoize and return the result
-        memo[index][open_count] = 1 if is_valid else 0
-        return is_valid
