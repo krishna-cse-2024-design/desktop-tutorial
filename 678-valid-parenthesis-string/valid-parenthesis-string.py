@@ -1,11 +1,5 @@
 class Solution:
     def checkValidString(self, s: str) -> bool:
-        # st = [] record left parenthesis
-        # star = []
-        # if *
-        # if '(' -> st.append(i)
-        # ')'-> st.pop() if not st-> star.pop()
-        #O(n),O(n)
         left = []
         star = []
         n = len(s)
