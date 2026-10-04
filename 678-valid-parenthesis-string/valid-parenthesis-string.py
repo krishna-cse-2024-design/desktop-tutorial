@@ -27,5 +27,3 @@ class Solution:
         if len(left)>0:
             return False
         return True
-
-
