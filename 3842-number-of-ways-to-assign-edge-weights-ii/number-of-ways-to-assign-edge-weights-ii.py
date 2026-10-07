@@ -1,67 +1,98 @@
-class Solution:
-    def assignEdgeWeights(self, edges: List[List[int]], queries: List[List[int]]) -> List[int]:
-        MOD = 10**9 + 7
-        n = len(edges) + 1
-        LOG = (n + 1).bit_length()
 
-        graph = [[] for _ in range(n + 1)]
-        for u, v in edges:
-            graph[u].append(v)
-            graph[v].append(u)
+# Submitted by Krishna Mittal on 07/10/2026
 
-        depth = [0] * (n + 1)
-        parent = [[0] * (n + 1) for _ in range(LOG)]
+import numpy
 
-        stack = [1]
-        visited = [False] * (n + 1)
-        visited[1] = True
+totals = [0] * 100_000
+totals[1] = total = 1
+for at in range(2, 100_000):
+    totals[at] = (total := (2*total) % 1_000_000_007)
 
-        while stack:
-            u = stack.pop()
-            for v in graph[u]:
-                if not visited[v]:
-                    visited[v] = True
-                    depth[v] = depth[u] + 1
-                    parent[0][v] = u
-                    stack.append(v)
+log2s = numpy.empty(200_000, dtype=numpy.int64)
+spans = numpy.empty(200_000, dtype=numpy.uint32)
+for at in range(1, 18):
+    spans[1 << at:2 << at] = (1 << at) - 1
+    log2s[1 << at:2 << at] = at
 
-        for k in range(1, LOG):
-            for v in range(1, n + 1):
-                p = parent[k - 1][v]
-                if p:
-                    parent[k][v] = parent[k - 1][p]
-
-        def lca(u, v):
-            if depth[u] < depth[v]:
-                u, v = v, u
-
-            diff = depth[u] - depth[v]
-            bit = 0
-            while diff:
-                if diff & 1:
-                    u = parent[bit][u]
-                diff >>= 1
-                bit += 1
-
-            if u == v:
-                return u
-
-            for k in range(LOG - 1, -1, -1):
-                if parent[k][u] != parent[k][v]:
-                    u = parent[k][u]
-                    v = parent[k][v]
-
-            return parent[0][u]
-
-        ans = []
-
-        for u, v in queries:
-            if u == v:
-                ans.append(0)
+def assignEdgeWeights(
+    _edges: List[List[int]], 
+    queries: List[List[int]],
+    totals=numpy.asarray(totals, dtype=numpy.uint32),
+    ancestors=[0]*100_001,
+    spans=spans, log2s=log2s,
+    dtypes=(numpy.uint8,)*9 + (numpy.uint16,)*8 + (numpy.uint32,)*3,    
+) -> List[int]:
+    cnt = len(_edges) + 1
+    edges = [[] for _ in range(cnt + 1)]
+    for at, to in _edges:
+        edges[at].append(to)
+        edges[to].append(at)
+    
+    tour = []        
+    ids = [0] * (cnt + 1)    
+    rank = -1    
+    depths = [0] * (cnt + 1)        
+    seen = bytearray(cnt + 1)
+    pending = [1]
+    while True:
+        if seen[at := pending[-1]]:
+            if at != 1:
+                tour.append(ancestors[at])
+                del pending[-1]
                 continue
+            break
+        else:
+            seen[at] = 1
+            tour.append(at)
+            ids[at] = rank = rank + 1
+            depth = depths[at] + 1
+            for to in edges[at]:
+                edges[to].remove(at)
+                ancestors[to] = at
+                depths[to] = depth
+                pending.append(to)
 
-            a = lca(u, v)
-            d = depth[u] + depth[v] - 2 * depth[a]
-            ans.append(pow(2, d - 1, MOD))
+    dtype = dtypes[cnt.bit_length()]
+    ids = numpy.asarray(ids, dtype=dtype)    
+    depths = numpy.asarray(depths, dtype=dtype)
+    depths[ids] = depths    
+    
+    tour = ids[tour]    
 
-        return ans
+    cnt = tour.size
+    dtype = dtypes[cnt.bit_length()]
+    tails = numpy.empty(cnt, dtype=dtype)    
+    tails[tour] = indices = numpy.arange(cnt, dtype=dtype)
+
+    bases = numpy.empty(cnt, dtype=dtype)    
+    bases[tour[::-1]] = indices[::-1]    
+        
+    mins = numpy.empty((cnt.bit_length(), cnt), dtype=ids.dtype.type)
+    mins[0, :] = tour
+    for level in range(mins.shape[0] - 1):
+        span = 1 << level
+        to = mins[level + 1]
+        numpy.minimum(
+            tour[:cnt - 2*span + 1],
+            tour[span:cnt - span + 1],
+            out=to[:cnt - 2*span + 1]
+        )
+        tour = to
+    
+    queries = ids[queries]         
+    solution = depths[queries].sum(axis=1)
+
+    ats = bases[queries].min(axis=1)
+    tos = tails[queries].max(axis=1)        
+    lengths = tos - ats
+    lengths += 1            
+    levels = log2s[lengths]
+    tos -= spans[lengths]
+    depths += depths # double depths so as to speed-up subsequent operation    
+    solution -= depths[numpy.minimum(mins[levels, ats], mins[levels, tos])]    
+    return totals[solution].tolist()          
+
+Solution = repeat(namedtuple('Solution', ('assignEdgeWeights',))(
+    assignEdgeWeights
+)).__next__
+        
