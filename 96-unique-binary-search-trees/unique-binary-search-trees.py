@@ -36,7 +36,6 @@ class Solution:
             return 742900
         elif n== 14:
             return 2674440
-            
         else:
             return 1 
         
