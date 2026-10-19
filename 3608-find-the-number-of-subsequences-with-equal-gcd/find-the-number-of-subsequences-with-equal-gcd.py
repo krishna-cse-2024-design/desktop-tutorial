@@ -1,4 +1,4 @@
-from math import gcd
+import math 
 
 class Solution:
     def subsequencePairCount(self, nums: List[int]) -> int:
